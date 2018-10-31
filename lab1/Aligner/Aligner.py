@@ -44,9 +44,38 @@ def compute_backpointers(s0, s1):
     if s0 == None or s1 == None:
         raise Exception('Both s0 and s1 have to be set')
 
-    backptr = [[[0, 0] for y in range(len(s1)+1)] for x in range(len(s0)+1)]
+    backptr = np.array([[[0, 0] for y in range(len(s1)+1)] for x in range(len(s0)+1)])
 
-    # YOUR CODE HERE
+    src_len = len(s0)+1
+    tar_len = len(s1)+1
+
+    edit_dist = np.zeros((src_len, tar_len))
+    edit_dist[:,0] = [i for i in range(src_len)]
+    edit_dist[0,:] = [i for i in range(tar_len)]
+    backptr[0,1:,1] = [i for i in range(tar_len-1)]
+    backptr[1:,0,0] = [i for i in range(src_len-1)]
+    
+    for i in range(1, src_len):
+        for j in range(1, tar_len):
+
+            dist = np.array([
+                edit_dist[i-1,j], 
+                edit_dist[i-1,j-1], 
+                edit_dist[i,j-1]])
+
+            costs = np.array([
+                edit_dist[i-1,j]+1, 
+                edit_dist[i-1,j-1]+subst_cost(s0[i-1], s1[j-1]), 
+                edit_dist[i,j-1]+1])
+
+            min_cost = costs.min()
+            idxs = np.where(costs == min_cost)[0]
+    
+            if idxs.size > 1:
+                idxs[0] = np.where(dist == dist.min())[0][0]
+                
+            backptr[i][j][:] = [[i-1, j], [i-1, j-1], [i, j-1]][idxs[0]]
+            edit_dist[i][j] = min_cost
 
     return backptr
 
@@ -57,7 +86,6 @@ def subst_cost(c0, c1):
     or 0 otherwise (when, in fact, there is no substitution).
     """
     return 0 if c0 == c1 else 2
-
 
 
 def align(s0, s1, backptr):
@@ -81,12 +109,31 @@ def align(s0, s1, backptr):
     """
     result = ['', '']
 
-    # YOUR CODE HERE
+    i = len(s0)
+    j = len(s1)
 
+    while i >= 0 and j >= 0:
+        if (backptr[i][j][:] == [i-1,j-1]).all():
+            result[0] = s0[i-1] + result[0]
+            result[1] = s1[j-1] + result[1]
+            i -= 1
+            j -= 1
+
+        elif (backptr[i][j][:] == [i-1,j]).all():
+            result[0] = s0[i-1] + result[0]
+            result[1] = ' ' + result[1]
+            i -= 1
+
+        elif (backptr[i][j][:] == [i,j-1]).all():
+            result[0] = ' ' + result[0]
+            result[1] = s1[j-1] + result[1]
+            j -= 1
+
+        if [i,j] == [0,0]:
+            break
+
+    result = [result[0][::-1], result[1][::-1]]
     return result
-
-
-
 
 def print_alignment(s):
     """
