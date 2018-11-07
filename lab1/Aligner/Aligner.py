@@ -112,7 +112,7 @@ def align(s0, s1, backptr):
     i = len(s0)
     j = len(s1)
 
-    while i >= 0 and j >= 0:
+    while i > 0 and j > 0:
         # if diag, compare char with char
         if (backptr[i][j][:] == [i-1,j-1]).all():
             result[0] = s0[i-1] + result[0]
@@ -132,8 +132,6 @@ def align(s0, s1, backptr):
             result[1] = s1[j-1] + result[1]
             j -= 1
 
-        if [i,j] == [0,0]:
-            break
 
     result = [result[0][::-1], result[1][::-1]]
     return result
