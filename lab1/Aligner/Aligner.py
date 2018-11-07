@@ -113,17 +113,20 @@ def align(s0, s1, backptr):
     j = len(s1)
 
     while i >= 0 and j >= 0:
+        # if diag, compare char with char
         if (backptr[i][j][:] == [i-1,j-1]).all():
             result[0] = s0[i-1] + result[0]
             result[1] = s1[j-1] + result[1]
             i -= 1
             j -= 1
 
+        # if left, compare char from source with blank space
         elif (backptr[i][j][:] == [i-1,j]).all():
             result[0] = s0[i-1] + result[0]
             result[1] = ' ' + result[1]
             i -= 1
 
+        # if up, compare char from target with blank space
         elif (backptr[i][j][:] == [i,j-1]).all():
             result[0] = ' ' + result[0]
             result[1] = s1[j-1] + result[1]
