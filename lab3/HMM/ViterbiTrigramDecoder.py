@@ -72,7 +72,7 @@ class ViterbiTrigramDecoder(object):
 		# YOUR CODE HERE
 
 		self.v[0,:,:] = self.a[Key.START_END,Key.START_END,:] + self.b[index[0],:]
-		# v[0,Key.START_END,:] -> prob of all states at obs 0 for succeding state key.START_END
+		# v[0,:,:] -> prob of all states at obs 0 for succeding state key.START_END
 		# prob all states 0->26 transition | 26,26
 		# prob all states 0->26 emitting 26 -> only space can emit 26
 
