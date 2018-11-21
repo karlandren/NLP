@@ -71,7 +71,7 @@ class ViterbiTrigramDecoder(object):
 
 		# YOUR CODE HERE
 
-		self.v[0,0,:] = self.a[Key.START_END,Key.START_END,:] + self.b[index[0],:]
+		self.v[0,:,:] = self.a[Key.START_END,Key.START_END,:] + self.b[index[0],:]
 		# v[0,Key.START_END,:] -> prob of all states at obs 0 for succeding state key.START_END
 		# prob all states 0->26 transition | 26,26
 		# prob all states 0->26 emitting 26 -> only space can emit 26
@@ -86,7 +86,7 @@ class ViterbiTrigramDecoder(object):
 
 		# YOUR CODE HERE
 
-		n_obs = len(self.v)
+		n_obs = len(s)
 		n_states = len(self.a)
 
 		for obs_idx in range(1, n_obs):
@@ -103,18 +103,18 @@ class ViterbiTrigramDecoder(object):
 		next_state = Key.START_END
 		after_next = Key.START_END
 		msg = ''
-		while c > -2: # the fuck??
+		while c >= -1:
 			msg = Key.index_to_char(this) + msg
 			this = next_state
 			next_state = after_next
 			after_next = self.backptr[c,next_state,this]
 			c -= 1
-		
+
 		# Finally return the result
 
 		# REPLACE THE LINE BELOW WITH YOUR CODE
 
-		return msg.strip() # what?? dessa läggs till pga backpointers i början?
+		return msg.strip()
 
 
 

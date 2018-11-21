@@ -1,0 +1,29 @@
+1a.
+Hidden states: The characters that were meant to be pressed
+Observations: Each observable character in the written string
+State transition probabilities: Probability of being on a character given the previous character.
+Observation probability: Probability of character emitting a mistyped character.
+
+1b.
+sh run_all_bigram_tests.sh
+
+2ab.
+sh run_all_trigram_tests.sh
+
+2c.
+Mistyped 1:
+Universal Declaration of Human Rights
+All human beings are born free and equal in dignity and rights. They are endowed with reason and conscience and should act towards one another in a spirit of brotherhood.
+
+Mistyped 2:
+Wikipedia article on Sweden
+
+Mistyped 3:
+An innovative European technical university
+Article about innovation on KTH
+
+Mistyped 4:
+Treaty on European Union, Article A
+
+Mistyped 5:
+Wikipedia article on Lions

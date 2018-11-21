@@ -65,7 +65,7 @@ class ViterbiBigramDecoder(object):
         # The Viterbi matrices
         self.v = np.zeros((len(s), Key.NUMBER_OF_CHARS))
         self.v[:,:] = -float("inf")
-        self.backptr = np.zeros((len(s) + 1, Key.NUMBER_OF_CHARS), dtype='int')
+        self.backptr = np.zeros((len(s), Key.NUMBER_OF_CHARS), dtype='int')
 
         # Initialization
         self.backptr[0,:] = Key.START_END
@@ -102,7 +102,7 @@ class ViterbiBigramDecoder(object):
 
         # REPLACE THE LINE BELOW WITH YOUR CODE
 
-        return msg[:-1].strip()
+        return msg.strip()
 
 
     # ------------------------------------------------------
