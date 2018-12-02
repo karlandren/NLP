@@ -1,0 +1,32 @@
+Batch gradient descent
+Model parameters:
+0: -2.4988  1: 3.1092  2: -0.8165
+                       Real class
+                        0        1
+Predicted class:  0 83831.000 3242.000
+                  1  879.000 12046.000
+
+Model parameters:
+0: -2.5338  1: 3.0314  2: -0.2888
+                       Real class
+                        0        1
+Predicted class:  0 80674.000 2015.000
+                  1 4036.000 13273.000
+
+
+Stochastic gradient descent
+Model parameters:
+0: -2.0096  1: 2.3779  2: 4.4399
+                       Real class
+                        0        1
+Predicted class:  0 80573.000 1968.000
+                  1 4137.000 13320.000
+
+
+Minibatch gradient descent
+Model parameters:
+0: -2.1926  1: 2.4125  2: -0.5649
+                       Real class
+                        0        1
+Predicted class:  0 83831.000 3242.000
+                  1  879.000 12046.000

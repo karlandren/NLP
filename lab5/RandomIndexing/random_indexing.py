@@ -23,7 +23,10 @@ class RandomIndexing(object):
 
     def clean_line(self, line):
         # YOUR CODE HERE
-        return []
+        whitelist = set('abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        answer = ''.join(filter(whitelist.__contains__, line))
+        answer = ' '.join(answer.split())
+        return [answer]
 
 
     def text_gen(self):
@@ -143,7 +146,8 @@ if __name__ == '__main__':
         os.remove('vocab.txt')
 
     if args.cleaning:
-        ri = RandomIndexing([os.path.join('data', 'example.txt')])
+        # ri = RandomIndexing([os.path.join('data', 'example.txt')])
+        ri = RandomIndexing(['example.txt'])
         with open(args.cleaned_output, 'w') as f:
             for part in ri.text_gen():
                 f.write("{}\n".format(" ".join(part)))
