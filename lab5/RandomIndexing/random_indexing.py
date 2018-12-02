@@ -8,7 +8,7 @@ from sklearn.neighbors import NearestNeighbors
 
 
 class RandomIndexing(object):
-    def __init__(self, filenames, dimension=2000, non_zero=100, non_zero_values=[-1, 1], left_window_size=2, right_window_size=2):
+    def __init__(self, filenames, dimension=2000, non_zero=100, non_zero_values=[-1, 1], left_window_size=3, right_window_size=3):
         self.__sources = filenames
         self.__vocab = set()
         self.__dim = dimension
@@ -77,6 +77,8 @@ class RandomIndexing(object):
 
         for i in self.__vocab:
             self.__rv[i] = np.where(np.random.rand(self.__dim) > 0.5, 1 , -1)
+            # self.__rv[i][8] = 0
+            # self.__rv[i][9] = 0
 
         for i in self.text_gen():
             # words = [w.capitalize() for w in i[0].split()]
@@ -102,18 +104,24 @@ class RandomIndexing(object):
         X = list(self.__cv.values())
         nearest.fit(X ,list(self.__cv.keys()))
         point = np.zeros(self.__dim)
+        vocab = np.array(list(self.__vocab))
+
         if len(words) == 1:
             point = np.array(self.__cv[words[0]]).reshape(1,-1)
-        else:
-            for i in range(len(words)):
-                point = point + self.__cv[words[i]]
-            point = np.array(point).reshape(1,-1)
-        closest  = nearest.kneighbors(point,return_distance=False)
+            closest  = nearest.kneighbors(point,return_distance=False)    
+            close = vocab[closest[0]]
+            return [close]
 
-        vocab = np.array(list(self.__vocab))
-   
-        close = vocab[closest[0]]
-        return [close]
+        else:
+            close = []
+
+            for i in range(len(words)):  
+                point = np.array(self.__cv[words[i]]).reshape(1,-1)
+                closest  = nearest.kneighbors(point,return_distance=False)
+                close.append(vocab[closest[0]])
+
+    
+            return [np.array(close)]
 
 
     def get_word_vector(self, word):
