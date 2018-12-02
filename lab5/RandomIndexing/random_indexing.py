@@ -8,7 +8,7 @@ from sklearn.neighbors import NearestNeighbors
 
 
 class RandomIndexing(object):
-    def __init__(self, filenames, dimension=2000, non_zero=100, non_zero_values=[-1, 1], left_window_size=3, right_window_size=3):
+    def __init__(self, filenames, dimension=2000, non_zero=100, non_zero_values=[-1, 1], left_window_size=2, right_window_size=2):
         self.__sources = filenames
         self.__vocab = set()
         self.__dim = dimension
@@ -41,6 +41,22 @@ class RandomIndexing(object):
         Build vocabulary of words from the provided text files
         """
         # YOUR CODE HERE
+        # print(0)
+
+        for i in self.text_gen():
+            
+            # print(1)
+            for k in i[0].split():
+                # print(2)
+                # if k.capitalize() not in self.__vocab:
+                if k not in self.__vocab:
+
+                    # print(k)
+                    # print(3)
+                    # self.__vocab.add(k.capitalize())
+                    self.__vocab.add(k)
+
+        print("*")
         self.write_vocabulary()
 
 
@@ -54,6 +70,26 @@ class RandomIndexing(object):
         Create word embeddings using Random Indexing
         """
         # YOUR CODE HERE
+        self.__rv = dict()
+        self.__cv = dict()
+        for i in self.__vocab:
+            self.__cv[i] = np.zeros(self.__dim)
+
+        for i in self.__vocab:
+            self.__rv[i] = np.where(np.random.rand(self.__dim) > 0.5, 1 , -1)
+
+        for i in self.text_gen():
+            # words = [w.capitalize() for w in i[0].split()]
+            words = i[0].split()
+
+            for k in range(len(words)):
+                for a in range(1,self.__lws+1):
+                    # print(words[k] + "**")
+                    if a <= k:
+                        self.__cv[words[k]] = self.__cv[words[k]] + self.__rv[words[k-a]]
+                    if a+k < len(words):
+                        self.__cv[words[k]] = self.__cv[words[k]] + self.__rv[words[k+a]]
+
         pass
 
 
@@ -62,7 +98,22 @@ class RandomIndexing(object):
         Function returning k nearest neighbors for each word in `words`
         """
         # YOUR CODE HERE
-        return [None]
+        nearest = NearestNeighbors(n_neighbors=k,metric=metric)
+        X = list(self.__cv.values())
+        nearest.fit(X ,list(self.__cv.keys()))
+        point = np.zeros(self.__dim)
+        if len(words) == 1:
+            point = np.array(self.__cv[words[0]]).reshape(1,-1)
+        else:
+            for i in range(len(words)):
+                point = point + self.__cv[words[i]]
+            point = np.array(point).reshape(1,-1)
+        closest  = nearest.kneighbors(point,return_distance=False)
+
+        vocab = np.array(list(self.__vocab))
+   
+        close = vocab[closest[0]]
+        return [close]
 
 
     def get_word_vector(self, word):
@@ -70,7 +121,8 @@ class RandomIndexing(object):
         Returns a trained vector for the word
         """
         # YOUR CODE HERE
-        return None
+    
+        return self.__cv[word]
 
 
     def vocab_exists(self):
@@ -102,11 +154,13 @@ class RandomIndexing(object):
         if self.vocab_exists():
             spinner.start(text="Reading vocabulary...")
             start = time.time()
+            print("-------")
             ri.read_vocabulary()
             spinner.succeed(text="Read vocabulary in {}s. Size: {} words".format(round(time.time() - start, 2), ri.vocabulary_size))
         else:
             spinner.start(text="Building vocabulary...")
             start = time.time()
+            print("*******")
             ri.build_vocabulary()
             spinner.succeed(text="Built vocabulary in {}s. Size: {} words".format(round(time.time() - start, 2), ri.vocabulary_size))
         
