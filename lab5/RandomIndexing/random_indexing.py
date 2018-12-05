@@ -77,6 +77,11 @@ class RandomIndexing(object):
         for i in self.__vocab:
             self.__rv[i] = np.where(np.random.rand(self.__dim) > 0.5, 1 , -1)
 
+            # set self.__dim - self.__non_zero to 0
+            n_zeros = self.__dim - self.__non_zero
+            zero_idxs = np.random.choice(self.__dim, n_zeros, replace=False)
+            self.__rv[i][zero_idxs] = 0
+
         # Generate cleaned lines
         for i in self.text_gen():
             words = i[0].split()
