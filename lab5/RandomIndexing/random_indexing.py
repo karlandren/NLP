@@ -140,8 +140,10 @@ class RandomIndexing(object):
         Returns a trained vector for the word
         """
         # YOUR CODE HERE
-    
-        return self.__cv[word]
+        if word in self.__cv:
+            return self.__cv[word]
+        else:
+            return None
 
 
     def vocab_exists(self):
