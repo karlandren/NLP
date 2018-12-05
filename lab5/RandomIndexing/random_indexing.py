@@ -23,13 +23,17 @@ class RandomIndexing(object):
 
     def clean_line(self, line):
         # YOUR CODE HERE
+
         whitelist = set('abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        # Remove characters in line that is not whitelisted and join together
         answer = ''.join(filter(whitelist.__contains__, line))
         answer = ' '.join(answer.split())
+        # Return clean a line
         return [answer]
 
 
     def text_gen(self):
+        # Cleans and returns all lines 
         for fname in self.__sources:
             with open(fname, encoding='utf8', errors='ignore') as f:
                 for line in f:
@@ -41,22 +45,13 @@ class RandomIndexing(object):
         Build vocabulary of words from the provided text files
         """
         # YOUR CODE HERE
-        # print(0)
 
+        # Iterate through cleaned lines and add word to vocab if it doesn't exist
         for i in self.text_gen():
-            
-            # print(1)
             for k in i[0].split():
-                # print(2)
-                # if k.capitalize() not in self.__vocab:
                 if k not in self.__vocab:
-
-                    # print(k)
-                    # print(3)
-                    # self.__vocab.add(k.capitalize())
                     self.__vocab.add(k)
 
-        print("*")
         self.write_vocabulary()
 
 
@@ -70,29 +65,32 @@ class RandomIndexing(object):
         Create word embeddings using Random Indexing
         """
         # YOUR CODE HERE
+
         self.__rv = dict()
         self.__cv = dict()
+
+        # For each word in the vocabulary, init a zero context vector
         for i in self.__vocab:
             self.__cv[i] = np.zeros(self.__dim)
 
+        # For each word in the vocabulary, init a random vector with -1 and 1's
         for i in self.__vocab:
             self.__rv[i] = np.where(np.random.rand(self.__dim) > 0.5, 1 , -1)
-            # self.__rv[i][8] = 0
-            # self.__rv[i][9] = 0
 
+        # Generate cleaned lines
         for i in self.text_gen():
-            # words = [w.capitalize() for w in i[0].split()]
             words = i[0].split()
 
+            # Iterate through each word
             for k in range(len(words)):
+                # a is the window index
                 for a in range(1,self.__lws+1):
-                    # print(words[k] + "**")
+                    # Only add the a precceding and succeding random vectors if there is a word
                     if a <= k:
-                        self.__cv[words[k]] = self.__cv[words[k]] + self.__rv[words[k-a]]
-                    if a+k < len(words):
-                        self.__cv[words[k]] = self.__cv[words[k]] + self.__rv[words[k+a]]
+                        self.__cv[words[k]] += self.__rv[words[k-a]]
+                    if a + k < len(words):
+                        self.__cv[words[k]] += self.__rv[words[k+a]]
 
-        pass
 
 
     def find_nearest(self, words, k=5, metric='cosine'):
@@ -100,28 +98,41 @@ class RandomIndexing(object):
         Function returning k nearest neighbors for each word in `words`
         """
         # YOUR CODE HERE
+
         nearest = NearestNeighbors(n_neighbors=k,metric=metric)
+        # Train KNN on context vectors
         X = list(self.__cv.values())
-        nearest.fit(X ,list(self.__cv.keys()))
+        # Set label for each cv to the string of the word
+        nearest.fit(X,list(self.__cv.keys()))
+
         point = np.zeros(self.__dim)
+        # Save vocab as array. Context vector i for word i corresponds to index i in vocab
         vocab = np.array(list(self.__vocab))
 
         if len(words) == 1:
-            point = np.array(self.__cv[words[0]]).reshape(1,-1)
-            closest  = nearest.kneighbors(point,return_distance=False)    
-            close = vocab[closest[0]]
-            return [close]
+            if words[0] in self.__cv:
+                point = np.array(self.__cv[words[0]]).reshape(1,-1)
+                # Find k nearest neighbors to the context vector of the word
+                closest  = nearest.kneighbors(point,return_distance=False)   
+                # Return strings of closest neighbors
+                close = vocab[closest[0]]
+                return [close]
+            else:
+                return ['Word does not exist in vocab']
 
         else:
             close = []
-
             for i in range(len(words)):  
-                point = np.array(self.__cv[words[i]]).reshape(1,-1)
-                closest  = nearest.kneighbors(point,return_distance=False)
-                close.append(vocab[closest[0]])
+                if words[i] in self.__cv:
+                    point = np.array(self.__cv[words[i]]).reshape(1,-1)
+                    # Find k nearest neighbors to the context vector of the word
+                    closest  = nearest.kneighbors(point,return_distance=False)
+                    # Return strings of closest neighbors
+                    close.append(vocab[closest[0]])
+                else:
+                    close.append("Word does not exist in vocab")
 
-    
-            return [np.array(close)]
+            return np.array(close)
 
 
     def get_word_vector(self, word):
