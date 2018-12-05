@@ -75,9 +75,12 @@ class RandomIndexing(object):
 
         # For each word in the vocabulary, init a random vector with -1 and 1's
         for i in self.__vocab:
-            self.__rv[i] = np.where(np.random.rand(self.__dim) > 0.5, 1 , -1)
+            self.__rv[i] = np.where(np.random.rand(
+                self.__dim) > 0.5, 
+                self.__non_zero_values[1], 
+                self.__non_zero_values[0])
 
-            # set self.__dim - self.__non_zero to 0
+            # set self.__dim - self.__non_zero many indexes to 0
             n_zeros = self.__dim - self.__non_zero
             zero_idxs = np.random.choice(self.__dim, n_zeros, replace=False)
             self.__rv[i][zero_idxs] = 0
